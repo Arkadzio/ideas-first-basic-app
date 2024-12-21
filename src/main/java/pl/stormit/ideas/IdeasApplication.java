@@ -6,6 +6,7 @@ import java.util.Optional;
 import pl.stormit.ideas.handlers.CategoryCommandHandler;
 import pl.stormit.ideas.handlers.CommandHandler;
 import pl.stormit.ideas.handlers.HelpCommandHandler;
+import pl.stormit.ideas.handlers.QuestionCommandHandler;
 import pl.stormit.ideas.handlers.QuitCommandHandler;
 import pl.stormit.ideas.input.UserInputCommand;
 import pl.stormit.ideas.input.UserInputManager;
@@ -26,6 +27,7 @@ public class IdeasApplication {
     handlers.add(new HelpCommandHandler());
     handlers.add(new QuitCommandHandler());
     handlers.add(new CategoryCommandHandler());
+    handlers.add(new QuestionCommandHandler());
 
     while (applicationLoop) {
       try {
