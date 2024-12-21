@@ -3,6 +3,7 @@ package pl.stormit.ideas;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import pl.stormit.ideas.handlers.CategoryCommandHandler;
 import pl.stormit.ideas.handlers.CommandHandler;
 import pl.stormit.ideas.handlers.HelpCommandHandler;
 import pl.stormit.ideas.handlers.QuitCommandHandler;
@@ -24,6 +25,7 @@ public class IdeasApplication {
     List<CommandHandler> handlers = new ArrayList<>();
     handlers.add(new HelpCommandHandler());
     handlers.add(new QuitCommandHandler());
+    handlers.add(new CategoryCommandHandler());
 
     while (applicationLoop) {
       try {
