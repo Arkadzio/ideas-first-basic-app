@@ -7,9 +7,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pl.stormit.ideas.model.Answer;
+import pl.stormit.ideas.model.Category;
 import pl.stormit.ideas.model.Question;
 
 public class QuestionDao {
+
+  private static Logger LOG = Logger.getLogger(QuestionDao.class.getName());
 
   private ObjectMapper objectMapper;
 
@@ -27,20 +35,40 @@ public class QuestionDao {
       return objectMapper.readValue(Files.readString(Paths.get("./questions.txt")), new TypeReference<>() {
       });
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.log(Level.WARNING, "Error on get Questions", e);
       return new ArrayList<>();
     }
   }
 
   public void add(Question question) {
+    List<Question> questions = getQuestions();
+    questions.add(question);
+
+    saveQuestions(questions);
+
+  }
+
+  private void saveQuestions(List<Question> questions) {
     try {
-      List<Question> questions = getQuestions();
-      questions.add(question);
-
       Files.writeString(Paths.get("./questions.txt"), objectMapper.writeValueAsString(questions));
-
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.log(Level.WARNING, "Error on save Questions", e);
     }
+  }
+
+  public Optional<Question> findOne(String name) {
+    return getQuestions().stream()
+        .filter(c -> c.getName().equals(name))
+        .findAny();
+  }
+
+  public void addAnswer(Question question, Answer answer) {
+    List<Question> questions = getQuestions();
+    for (Question q : questions) {
+      if (Objects.equals(q.getName(), question.getName())) {
+        q.getAnswers().add(answer);
+      }
+    }
+    saveQuestions(questions);
   }
 }

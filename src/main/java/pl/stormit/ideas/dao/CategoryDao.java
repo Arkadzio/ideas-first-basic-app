@@ -8,11 +8,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import pl.stormit.ideas.model.Category;
 import pl.stormit.ideas.model.Question;
 
 public class CategoryDao {
 
+  private static Logger LOG = Logger.getLogger(CategoryDao.class.getName());
   private ObjectMapper objectMapper;
 
   public CategoryDao() {
@@ -25,6 +28,7 @@ public class CategoryDao {
       });
     } catch (IOException e) {
       e.printStackTrace();
+      LOG.log(Level.WARNING, "Error on get Categories", e);
       return new ArrayList<>();
     }
   }
@@ -41,7 +45,7 @@ public class CategoryDao {
       Files.writeString(Paths.get("./categories.txt"), objectMapper.writeValueAsString(categories));
 
     } catch (IOException e) {
-      e.printStackTrace();
+      LOG.log(Level.WARNING, "Error on add Category", e);
     }
 
 
