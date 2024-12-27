@@ -16,7 +16,7 @@ import pl.stormit.ideas.input.UserInputManager;
 
 public class IdeasApplication {
 
-  private static Logger LOG = Logger.getLogger(IdeasApplication.class.getName());
+  private static final Logger LOG = Logger.getLogger(IdeasApplication.class.getName());
 
   public static void main(String[] args) {
     new IdeasApplication().start();
