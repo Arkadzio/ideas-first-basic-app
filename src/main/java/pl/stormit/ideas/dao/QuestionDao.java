@@ -1,74 +1,45 @@
 package pl.stormit.ideas.dao;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import pl.stormit.ideas.model.Answer;
-import pl.stormit.ideas.model.Category;
 import pl.stormit.ideas.model.Question;
 
 public class QuestionDao {
 
-  private static Logger LOG = Logger.getLogger(QuestionDao.class.getName());
-
-  private ObjectMapper objectMapper;
+  private final GenericDao<Question> genericDao;
 
   public QuestionDao() {
-    this.objectMapper = new ObjectMapper();
-  }
-
-  public List<Question> findAll() {
-
-    return getQuestions();
-  }
-
-  private List<Question> getQuestions() {
-    try {
-      return objectMapper.readValue(Files.readString(Paths.get("./questions.txt")), new TypeReference<>() {
-      });
-    } catch (IOException e) {
-      LOG.log(Level.WARNING, "Error on get Questions", e);
-      return new ArrayList<>();
-    }
+    this.genericDao = new GenericDao<>("./questions.txt", new TypeReference<>() {
+    });
   }
 
   public void add(Question question) {
-    List<Question> questions = getQuestions();
-    questions.add(question);
-
-    saveQuestions(questions);
-
-  }
-
-  private void saveQuestions(List<Question> questions) {
-    try {
-      Files.writeString(Paths.get("./questions.txt"), objectMapper.writeValueAsString(questions));
-    } catch (IOException e) {
-      LOG.log(Level.WARNING, "Error on save Questions", e);
-    }
+    genericDao.add(question);
   }
 
   public Optional<Question> findOne(String name) {
-    return getQuestions().stream()
-        .filter(c -> c.getName().equals(name))
-        .findAny();
+    return genericDao.findOne(q -> q.getName().equalsIgnoreCase(name.trim()));
   }
 
   public void addAnswer(Question question, Answer answer) {
-    List<Question> questions = getQuestions();
-    for (Question q : questions) {
-      if (Objects.equals(q.getName(), question.getName())) {
-        q.getAnswers().add(answer);
-      }
+    Optional<Question> optionalQuestion = findOne(question.getName());
+    if (optionalQuestion.isPresent()) {
+      Question foundQuestion = optionalQuestion.get();
+      foundQuestion.getAnswers().add(answer);
+      save(foundQuestion);
     }
-    saveQuestions(questions);
+  }
+
+  public void save(Question question) {
+    List<Question> questions = genericDao.findAll();
+    questions.removeIf(q -> q.getName().equalsIgnoreCase(question.getName()));
+    questions.add(question);
+    genericDao.saveAll(questions);
+  }
+
+  public void logAllQuestions() {
+    genericDao.findAll().forEach(q -> System.out.println(" Question: " + q.getName()));
   }
 }
